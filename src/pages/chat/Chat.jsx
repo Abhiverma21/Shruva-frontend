@@ -9,6 +9,7 @@ import ProfileSection from './sections/ProfileSection';
 import FriendsSection from './sections/FriendsSection';
 import { AuthContext } from '../../context/AuthContext';
 import { initSocket } from '../../services/socketService';
+import { getChats } from '../../api/chatApi';
 
 export default function Chat() {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ export default function Chat() {
   // Determine which section is active based on URL
   const pathParts = location.pathname.split('/').filter(Boolean);
   const activeSection = pathParts[1] || 'chats';
-  const chatId = pathParts[2];
+  const chatId = pathParts[2]; // This will be the chatId if URL is /chat/message/chatId
 
   // Initialize Socket.io on mount and when user changes
   useEffect(() => {
@@ -43,6 +44,36 @@ export default function Chat() {
       }
     }
   }, [chatId, chats]);
+
+  // Fetch a specific chat when directly accessing via URL and chat not in state
+  useEffect(() => {
+    if (chatId && !selectedChat && activeSection === 'message') {
+      const fetchChatById = async () => {
+        try {
+          const { chats: fetchedChats } = await getChats();
+          const foundChat = fetchedChats?.find(c => c._id === chatId);
+          if (foundChat) {
+            const formattedChat = {
+              _id: foundChat._id,
+              chatId: foundChat._id,
+              id: foundChat._id,
+              name: foundChat.friend?.fullName || 'Unknown',
+              username: foundChat.friend?.username || '',
+              friend: foundChat.friend,
+              lastMessage: foundChat.lastMessage?.text || '',
+              timestamp: foundChat.lastMessage?.createdAt ? new Date(foundChat.lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
+              unread: 0,
+              isOnline: false,
+            };
+            setSelectedChat(formattedChat);
+          }
+        } catch (err) {
+          console.error("Failed to fetch chat", err);
+        }
+      };
+      fetchChatById();
+    }
+  }, [chatId, activeSection, selectedChat]);
 
   const handleNavigateSection = (section) => {
     navigate(`/chat/${section}`);
