@@ -1,5 +1,7 @@
 import React from 'react'
 import { FaComment, FaPalette, FaLock, FaMoon, FaLeaf } from 'react-icons/fa'
+import logoImg from '../../assets/logo.png';
+import aboutImg from '../../assets/About.jpeg';
 
 const About = () => {
   return (
@@ -43,7 +45,7 @@ const About = () => {
                   <div className="absolute bottom-10 right-10 w-56 h-56 bg-blue-400 rounded-full blur-3xl"></div>
                 </div>
                 <div className="relative z-10 text-6xl">
-                    <img src="/src/assets/logo.png" alt="Logo Image" />
+                    <img src={logoImg} alt="Logo Image" />
                 </div>
               </div>
             </div>
@@ -159,7 +161,7 @@ const About = () => {
                   <div className="absolute bottom-20 right-20 w-40 h-40 bg-blue-400 rounded-full blur-3xl"></div>
                 </div>
                 <div className="relative z-10 text-center">
-                <img src="/src/assets/About.jpeg" alt="Design Image" />
+                <img src={aboutImg} alt="Design Image" />
                 </div>
               </div>
             </div>

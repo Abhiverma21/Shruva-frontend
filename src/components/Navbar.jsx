@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { HiMenu, HiX } from "react-icons/hi";
+import logoImg from "../assets/logo.png";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -24,7 +25,7 @@ const Navbar = () => {
           className="text-2xl font-bold text-white flex items-center gap-2 hover:scale-105 transition-transform"
           onClick={() => setIsOpen(false)}
         >
-          <img src="/src/assets/logo.png" className="size-12" />
+          <img src={logoImg} className="size-12" />
           Shruva
         </Link>
 
