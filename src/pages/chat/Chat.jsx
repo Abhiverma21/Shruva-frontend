@@ -1,13 +1,10 @@
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useLocation, useNavigate, Routes, Route } from 'react-router-dom';
+import { FiMenu } from 'react-icons/fi';
 import LeftNavbar from './LeftNavbar';
 import ChatSidebar from './ChatSidebar';
 import ChatWindow from './ChatWindow';
-import NewChatModal from './NewChatModal';
-import ActivitySection from './sections/ActivitySection';
-import FavoritesSection from './sections/FavoritesSection';
 import CallsSection from './sections/CallsSection';
-import SettingsSection from './sections/SettingsSection';
 import ProfileSection from './sections/ProfileSection';
 import FriendsSection from './sections/FriendsSection';
 import { AuthContext } from '../../context/AuthContext';
@@ -19,6 +16,7 @@ export default function Chat() {
   const [selectedChat, setSelectedChat] = useState(null);
   const [chats, setChats] = useState([]);
   const [chatFilter, setChatFilter] = useState('all');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user } = useContext(AuthContext);
 
   // Determine which section is active based on URL
@@ -58,12 +56,29 @@ export default function Chat() {
 
   return (
     <div className="flex flex-col md:flex-row h-screen bg-gray-50 overflow-hidden">
-      {/* Left Navigation Sidebar - desktop only */}
+
+      {/* Left Navigation Sidebar */}
       <div className="hidden md:block">
         <LeftNavbar 
           activeSection={activeSection}
           setActiveSection={handleNavigateSection}
           selectedChat={selectedChat}
+          mobileMenuOpen={false}
+          setMobileMenuOpen={() => {}}
+        />
+      </div>
+
+      {/* Mobile Side Navigation */}
+      <div className="md:hidden">
+        <LeftNavbar 
+          activeSection={activeSection}
+          setActiveSection={(section) => {
+            handleNavigateSection(section);
+            setMobileMenuOpen(false);
+          }}
+          selectedChat={selectedChat}
+          mobileMenuOpen={mobileMenuOpen}
+          setMobileMenuOpen={setMobileMenuOpen}
         />
       </div>
 
@@ -117,6 +132,18 @@ export default function Chat() {
 
       {/* Mobile Layout: Full screen for each section */}
       <div className="md:hidden flex-1 flex flex-col overflow-hidden">
+        {/* Mobile Header with Menu Button */}
+        <div className="md:hidden bg-gradient-to-r from-purple-700 to-purple-900 text-white p-4 flex items-center gap-3">
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-all"
+            title="Menu"
+          >
+            <FiMenu size={24} />
+          </button>
+          <h1 className="text-xl font-bold">Chat App</h1>
+        </div>
+
         {activeSection === 'chats' ? (
           <ChatSidebar
             selectedChat={selectedChat}
@@ -150,15 +177,6 @@ export default function Chat() {
             setChats={setChats}
           />
         )}
-      </div>
-
-      {/* Mobile Bottom Navigation - Always visible on mobile */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-40">
-        <LeftNavbar 
-          activeSection={activeSection}
-          setActiveSection={handleNavigateSection}
-          selectedChat={selectedChat}
-        />
       </div>
     </div>
   );

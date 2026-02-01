@@ -4,11 +4,15 @@ import { AuthContext } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import logoImg from '../../assets/logo.png';
 
-export default function LeftNavbar({ activeSection, setActiveSection, selectedChat }) {
+export default function LeftNavbar({ activeSection, setActiveSection, selectedChat, mobileMenuOpen, setMobileMenuOpen }) {
   const { logout } = useContext(AuthContext);
-  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const [localMobileMenuOpen, setLocalMobileMenuOpen] = React.useState(false);
   const navigate = useNavigate();
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+
+  // Use props if provided, otherwise use local state
+  const menuOpen = mobileMenuOpen !== undefined ? mobileMenuOpen : localMobileMenuOpen;
+  const setMenuOpen = setMobileMenuOpen !== undefined ? setMobileMenuOpen : setLocalMobileMenuOpen;
 
   // Settings state
   const [settings, setSettings] = useState({
@@ -25,13 +29,6 @@ export default function LeftNavbar({ activeSection, setActiveSection, selectedCh
     { id: 'calls', icon: FiPhone, label: 'Calls', tooltip: 'Call History' },
   ];
 
-  // Mobile menu - only Messages, Profile, and Calls
-  const mobileMenuItems = [
-    { id: 'chats', icon: FiMessageSquare, label: 'Chat', tooltip: 'Messages' },
-    { id: 'profile', icon: FiUser, label: 'Profile', tooltip: 'My Profile' },
-    { id: 'calls', icon: FiPhone, label: 'Calls', tooltip: 'Call History' },
-  ];
-
   const actionItems = [
     { id: 'add-group', icon: FiPlus, label: 'Add Group', tooltip: 'Create Group' },
     { id: 'add-contact', icon: FiUser, label: 'Add Contact', tooltip: 'Add Contact' },
@@ -40,7 +37,7 @@ export default function LeftNavbar({ activeSection, setActiveSection, selectedCh
 
   const handleMenuClick = (sectionId) => {
     setActiveSection(sectionId);
-    setMobileMenuOpen(false);
+    setMenuOpen(false);
   };
 
   const handleLogout = () => {
@@ -58,14 +55,14 @@ export default function LeftNavbar({ activeSection, setActiveSection, selectedCh
   return (
     <>
       {/* Mobile Menu Overlay */}
-      {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-30 bg-black bg-opacity-50" onClick={() => setMobileMenuOpen(false)} />
+      {menuOpen && (
+        <div className="md:hidden fixed inset-0 z-30 bg-black bg-opacity-30 pointer-events-auto" onClick={() => setMenuOpen(false)} />
       )}
 
       <div
         className={`${
-          mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-        } md:translate-x-0 relative md:relative w-full md:w-20 h-20 md:h-screen bg-gradient-to-r md:bg-gradient-to-b from-purple-700 to-purple-900 flex md:flex-col items-center justify-between md:justify-start md:py-4 shadow-xl transition-transform duration-300 border-t md:border-t-0 md:border-r border-purple-800 px-2 md:px-0`}
+          menuOpen ? 'translate-x-0' : '-translate-x-full'
+        } md:translate-x-0 fixed md:relative top-20 md:top-0 left-0 z-40 md:z-0 md:w-20 w-64 h-screen md:h-screen bg-gradient-to-r md:bg-gradient-to-b from-purple-700 to-purple-900 md:flex md:flex-col items-center md:items-center justify-start md:justify-start md:py-4 shadow-xl transition-transform duration-300 border-t md:border-t-0 md:border-r border-purple-800 px-4 md:px-0`}
       >
         {/* Logo - Hidden on mobile */}
         <div className="hidden md:flex items-center justify-center w-12 h-12 rounded-full bg-white bg-opacity-20 mb-4 hover:bg-opacity-30 transition-all cursor-pointer relative group">
@@ -78,37 +75,17 @@ export default function LeftNavbar({ activeSection, setActiveSection, selectedCh
           </div>
         </div>
 
-        {/* Mobile Menu Items - simplified to only Messages, Profile, Calls */}
-        <div className="md:hidden flex flex-row gap-1 items-center justify-center flex-1">
-          {mobileMenuItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleMenuClick(item.id)}
-                className={`h-12 w-12 md:h-14 md:w-14 rounded-lg flex items-center justify-center transition-all duration-300 flex-1 ${
-                  activeSection === item.id
-                    ? 'bg-white text-purple-700 shadow-lg'
-                    : 'text-white hover:bg-white hover:bg-opacity-20'
-                }`}
-                title={item.tooltip}
-              >
-                <Icon size={22} />
-              </button>
-            );
-          })}
-          {/* Mobile Logout Button */}
-          <button
-            onClick={handleLogout}
-            className="h-12 w-12 md:h-14 md:w-14 rounded-lg flex items-center justify-center text-white hover:bg-red-500 hover:bg-opacity-80 transition-all flex-1"
-            title="Logout"
-          >
-            <FiLogOut size={22} />
-          </button>
-        </div>
+        {/* Mobile Menu Toggle Button */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="md:hidden h-12 w-12 rounded-lg flex items-center justify-center text-white hover:bg-white hover:bg-opacity-20 transition-all"
+          title="Menu"
+        >
+          <FiX size={24} className={`transform transition-transform ${menuOpen ? 'rotate-0' : 'rotate-45'}`} />
+        </button>
 
       {/* Desktop Menu Items */}
-      <div className="hidden md:flex md:flex-1 md:flex-col gap-4 items-center md:items-stretch justify-center md:justify-start">
+      <div className="md:flex md:flex-1 md:flex-col gap-4 items-center md:items-stretch justify-center md:justify-start hidden md:flex">
         {menuItems.map((item) => {
           const Icon = item.icon;
           return (
@@ -133,7 +110,29 @@ export default function LeftNavbar({ activeSection, setActiveSection, selectedCh
         })}
       </div>
 
-      {/* Action Items - Bottom (desktop only) */}
+      {/* Mobile Menu Items */}
+      <div className="md:hidden flex flex-col gap-3 w-full mt-4">
+        {menuItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <button
+              key={item.id}
+              onClick={() => handleMenuClick(item.id)}
+              className={`w-full px-4 py-3 rounded-lg flex items-center gap-3 transition-all duration-300 ${
+                activeSection === item.id
+                  ? 'bg-white text-purple-700 shadow-lg font-semibold'
+                  : 'text-white hover:bg-white hover:bg-opacity-20'
+              }`}
+              title={item.tooltip}
+            >
+              <Icon size={22} />
+              <span className="text-sm font-medium">{item.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Action Items - Bottom */}
       <div className="hidden md:flex md:flex-col gap-4 border-t border-white border-opacity-20 pt-4">
         {actionItems.map((item) => {
           const Icon = item.icon;
@@ -163,7 +162,33 @@ export default function LeftNavbar({ activeSection, setActiveSection, selectedCh
         })}
       </div>
 
-      {/* Logout Button - Desktop only */}
+      {/* Mobile Action Items */}
+      <div className="md:hidden flex flex-col gap-3 w-full border-t border-white border-opacity-20 pt-4 mt-4">
+        {actionItems.map((item) => {
+          const Icon = item.icon;
+          return (
+            <button
+              key={item.id}
+              onClick={() => {
+                if (item.id === 'add-group') {
+                  alert('Add Group functionality - Coming soon!');
+                } else if (item.id === 'add-contact') {
+                  alert('Add Contact functionality - Coming soon!');
+                } else if (item.id === 'settings') {
+                  setShowSettingsModal(true);
+                }
+              }}
+              className="w-full px-4 py-3 rounded-lg flex items-center gap-3 text-white hover:bg-white hover:bg-opacity-20 transition-all"
+              title={item.tooltip}
+            >
+              <Icon size={22} />
+              <span className="text-sm font-medium">{item.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Logout Button */}
       <button
         onClick={handleLogout}
         className="hidden md:flex w-12 h-12 rounded-full items-center justify-center text-white hover:bg-red-500 hover:bg-opacity-80 transition-all group relative mt-4"
@@ -175,6 +200,16 @@ export default function LeftNavbar({ activeSection, setActiveSection, selectedCh
         <div className="absolute left-full ml-4 px-3 py-1 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
           Logout
         </div>
+      </button>
+
+      {/* Mobile Logout Button */}
+      <button
+        onClick={handleLogout}
+        className="md:hidden w-full px-4 py-3 rounded-lg flex items-center gap-3 text-white hover:bg-red-500 hover:bg-opacity-80 transition-all mt-4"
+        title="Logout"
+      >
+        <FiLogOut size={22} />
+        <span className="text-sm font-medium">Logout</span>
       </button>
       </div>
 

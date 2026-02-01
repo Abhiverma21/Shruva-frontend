@@ -251,19 +251,7 @@ export default function ChatSidebar({ selectedChat, setSelectedChat, chatFilter,
         )}
       </div>
 
-      {/* Mobile Bottom Action Section */}
-      <div className="md:hidden flex-shrink-0 border-t border-gray-200 bg-gray-50 p-4">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex-1 flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-gray-200">
-            <span className="text-sm font-medium text-gray-700">Active</span>
-            <div className="w-3 h-3 rounded-full bg-green-500"></div>
-          </div>
-          <button className="flex items-center justify-center gap-2 px-3 py-2 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
-            <span className="text-lg">📞</span>
-            <span className="text-sm font-medium text-gray-700">Call</span>
-          </button>
-        </div>
-      </div>
+
       {newChatOpen && (
         <NewChatModal
           isSidebar={true}

@@ -2,48 +2,7 @@ import React from 'react';
 import { FiPhone, FiVideoOff, FiPhoneMissed, FiClock, FiArrowLeft } from 'react-icons/fi';
 
 export default function CallsSection({ isSidebar = false, onBack }) {
-  const calls = [
-    {
-      id: 1,
-      name: 'Sarah Johnson',
-      avatar: '👩‍💼',
-      type: 'incoming',
-      status: 'completed',
-      duration: '15 min',
-      timestamp: '2:30 PM',
-      icon: FiPhone,
-    },
-    {
-      id: 2,
-      name: 'Design Team',
-      avatar: '🎨',
-      type: 'video',
-      status: 'completed',
-      duration: '1h 20m',
-      timestamp: '10:00 AM',
-      icon: FiVideoOff,
-    },
-    {
-      id: 3,
-      name: 'John Smith',
-      avatar: '👨‍💻',
-      type: 'incoming',
-      status: 'missed',
-      duration: '-',
-      timestamp: 'Yesterday',
-      icon: FiPhoneMissed,
-    },
-    {
-      id: 4,
-      name: 'Alex Chen',
-      avatar: '👨‍🎨',
-      type: 'outgoing',
-      status: 'completed',
-      duration: '5 min',
-      timestamp: '3 days ago',
-      icon: FiPhone,
-    },
-  ];
+  const calls = [];
 
   if (isSidebar) {
     return (
