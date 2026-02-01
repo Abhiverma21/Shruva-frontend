@@ -13,7 +13,7 @@ import Demo from "./pages/Demo/Demo"
 
 function App() {
   const location = useLocation()
-  const isChatPage = location.pathname === "/chat"
+  const isChatPage = location.pathname.startsWith("/chat")
 
   return (
     <>
@@ -27,7 +27,7 @@ function App() {
       <Route path ="/signup" element={<SignUp/>}></Route>
       <Route path ="/login" element={<Login/>}></Route>
       <Route path ="/about" element={<About/>}></Route>
-      <Route path ="/chat" element={<Chat/>}></Route>
+      <Route path ="/chat/*" element={<Chat/>}></Route>
       <Route path ="/demo" element={<Demo/>}></Route>
     
     </Routes>

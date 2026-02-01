@@ -4,6 +4,7 @@ import { FaFacebook, FaGoogle } from "react-icons/fa";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
+    username: "",
     fullName: "",
     email: "",
     password: "",
@@ -27,7 +28,8 @@ const SignUp = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: formData.fullName, // 🔑 mapping
+          username: formData.username,
+          fullName: formData.fullName,
           email: formData.email,
           password: formData.password,
         }),
@@ -44,6 +46,7 @@ const SignUp = () => {
       navigate("/");
       // reset form
       setFormData({
+        username: "",
         fullName: "",
         email: "",
         password: "",
@@ -88,6 +91,17 @@ const SignUp = () => {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4 mb-6" action="">
+            {/* Username */}
+            <input
+              type="text"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              placeholder="Username"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+              required
+            />
+
             {/* Full Name */}
             <input
               type="text"

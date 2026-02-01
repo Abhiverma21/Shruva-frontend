@@ -99,36 +99,43 @@ export default function CallsSection({ isSidebar = false, onBack }) {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-white overflow-hidden">
+    <div className="flex-1 flex flex-col bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200 bg-white shadow-sm flex-shrink-0">
-        <h2 className="text-2xl font-bold text-gray-900">Calls</h2>
-        <p className="text-sm text-gray-600 mt-1">Recent call history</p>
+      <div className="px-8 py-6 border-b border-gray-200 bg-white shadow-sm flex-shrink-0">
+        <div className="flex items-center gap-3 mb-2">
+          {onBack && (
+            <button onClick={onBack} className="md:hidden p-1 hover:bg-gray-100 rounded-full transition-colors text-purple-600">
+              <FiArrowLeft size={20} />
+            </button>
+          )}
+          <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">Calls</h2>
+        </div>
+        <p className="text-sm text-gray-600 ml-0 md:ml-0">Recent call history</p>
       </div>
 
       {/* Call List */}
       <div className="flex-1 overflow-y-auto">
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y divide-gray-200">
           {calls.map((call) => {
             const Icon = call.icon;
             return (
               <div
                 key={call.id}
-                className="px-6 py-4 hover:bg-gray-50 transition-colors cursor-pointer flex items-center justify-between group"
+                className="px-8 py-5 hover:bg-white transition-all cursor-pointer flex items-center justify-between group"
               >
                 <div className="flex items-center gap-4 flex-1">
                   <div className="flex-shrink-0 relative">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-lg text-white font-semibold">
+                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-lg text-white font-semibold shadow-md">
                       {call.avatar}
                     </div>
                     <div className={`absolute bottom-0 right-0 p-1 rounded-full ${
                       call.status === 'missed' ? 'bg-red-500' : 'bg-green-500'
-                    } text-white`}>
+                    } text-white shadow-md`}>
                       <Icon size={12} />
                     </div>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-900">{call.name}</p>
+                    <p className="font-semibold text-gray-900 text-lg">{call.name}</p>
                     <div className="flex items-center gap-2 mt-1">
                       <FiClock size={14} className="text-gray-500" />
                       <span className="text-sm text-gray-600">{call.duration}</span>

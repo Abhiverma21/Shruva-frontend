@@ -83,9 +83,16 @@ export default function ActivitySection({ isSidebar = false, onBack }) {
   return (
     <div className="flex-1 flex flex-col bg-white overflow-hidden">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200 bg-white shadow-sm flex-shrink-0">
-        <h2 className="text-2xl font-bold text-gray-900">Activity</h2>
-        <p className="text-sm text-gray-600 mt-1">Recent activity from your contacts</p>
+      <div className="px-6 py-4 border-b border-gray-200 bg-white shadow-sm flex-shrink-0 flex items-center gap-3">
+        {onBack && (
+          <button onClick={onBack} className="md:hidden p-1 hover:bg-gray-100 rounded-full transition-colors text-purple-600">
+            <FiArrowLeft size={20} />
+          </button>
+        )}
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Activity</h2>
+          <p className="text-sm text-gray-600 mt-1">Recent activity from your contacts</p>
+        </div>
       </div>
 
       {/* Activity List */}
