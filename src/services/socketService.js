@@ -5,7 +5,7 @@ let socket = null;
 export const initSocket = (userId) => {
   if (socket) return socket;
 
-  socket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000', {
+  socket = io(import.meta.env.VITE_SOCKET_URL || 'https://shruva-backend.onrender.com', {
     auth: {
       token: localStorage.getItem('token'),
     },

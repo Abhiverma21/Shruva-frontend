@@ -17,7 +17,7 @@ export default function UserProfile({ onBackClick }) {
     const token = localStorage.getItem('token');
     if (!token) return;
     setLoading(true);
-    fetch('/api/users/friends', { headers: { Authorization: `Bearer ${token}` } })
+    fetch('https://shruva-backend.onrender.com/api/users/friends', { headers: { Authorization: `Bearer ${token}` } })
       .then((r) => r.json())
       .then((data) => {
         if (data.success) setFriends(data.friends || []);
@@ -33,7 +33,7 @@ export default function UserProfile({ onBackClick }) {
     const token = localStorage.getItem('token');
     if (!window.confirm('Remove this friend?')) return;
     try {
-      const res = await fetch('/api/users/remove-friend', {
+      const res = await fetch('https://shruva-backend.onrender.com/api/users/remove-friend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ friendId }),

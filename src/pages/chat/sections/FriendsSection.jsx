@@ -17,7 +17,7 @@ export default function FriendsSection({ onBack }) {
           setLoading(false);
           return;
         }
-        const response = await fetch('http://localhost:3000/api/users/friends', {
+        const response = await fetch('https://shruva-backend.onrender.com/api/users/friends', {
           method: 'GET',
           headers: { 
             'Authorization': `Bearer ${token}`,
