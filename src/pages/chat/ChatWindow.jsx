@@ -76,19 +76,42 @@ export default function ChatWindow({ chat, onBackClick }) {
   const handleSendMessage = async (text) => {
     if (!text.trim()) return;
 
+    // Create an optimistic message to show immediately
+    const optimisticMessage = {
+      _id: `temp-${Date.now()}`,
+      text: text.trim(),
+      senderId: {
+        _id: user.id,
+        username: user.username,
+        fullName: user.fullName,
+      },
+      chatId: chat.chatId || chat._id,
+      createdAt: new Date().toISOString(),
+      isSeen: false,
+      isOptimistic: true,
+    };
+
+    // Add optimistic message immediately to UI
+    setMessages(prev => [...prev, optimisticMessage]);
+
     try {
       const { message } = await sendMessage({
         chatId: chat.chatId || chat._id,
         text,
       });
-      // Add message immediately to UI
+      
+      // Replace optimistic message with real message from server
       setMessages(prev => {
-        const isDuplicate = prev.some(m => m._id === message._id);
-        if (isDuplicate) return prev;
-        return [...prev, message];
+        return prev.map(msg => 
+          msg._id === optimisticMessage._id ? message : msg
+        );
       });
     } catch (err) {
       console.error("Failed to send message", err);
+      // Remove optimistic message on error
+      setMessages(prev => 
+        prev.filter(msg => msg._id !== optimisticMessage._id)
+      );
       const errorMsg = err.response?.data?.message || err.message || 'Failed to send message';
       alert(`Error: ${errorMsg}`);
     }
@@ -111,29 +134,27 @@ export default function ChatWindow({ chat, onBackClick }) {
   return (
     <div className="flex-1 flex flex-col bg-white overflow-hidden h-screen w-full">
       {/* Header */}
-      <div className="flex items-center justify-between p-3 md:p-4 border-b border-gray-200 bg-white shadow-sm flex-shrink-0">
-        <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
+      <div className="flex items-center justify-between p-2 md:p-4 border-b border-gray-200 bg-white shadow-sm flex-shrink-0">
+        <div className="flex items-center gap-1 md:gap-3 flex-1 min-w-0">
           <button 
             onClick={onBackClick}
-            className="md:hidden p-2 hover:bg-gray-100 rounded-full transition-colors text-purple-600 flex-shrink-0"
+            className="md:hidden p-1.5 hover:bg-gray-100 rounded-full transition-colors text-purple-600 flex-shrink-0"
           >
-            <FiArrowLeft size={20} />
+            <FiArrowLeft size={18} />
           </button>
-          <div>
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-lg text-white font-semibold shadow-md">
-              {friend.fullName?.charAt(0).toUpperCase() || '?'}
-            </div>
+          <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-sm md:text-lg text-white font-semibold shadow-md flex-shrink-0">
+            {friend.fullName?.charAt(0).toUpperCase() || '?'}
           </div>
           <div className="min-w-0">
-            <h2 className="font-semibold text-gray-900 text-sm truncate">{friend.fullName || 'Unknown'}</h2>
-            <p className="text-xs text-gray-500">@{friend.username || 'unknown'}</p>
+            <h2 className="font-semibold text-gray-900 text-xs md:text-sm truncate">{friend.fullName || 'Unknown'}</h2>
+            <p className="text-xs text-gray-500 hidden md:block">@{friend.username || 'unknown'}</p>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-1">
-          <button className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-600 hover:text-purple-600">
-            <FiPhone size={18} title="Voice Call" />
+        <div className="flex items-center gap-0.5 md:gap-1">
+          <button className="p-1.5 md:p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-600 hover:text-purple-600">
+            <FiPhone size={16} md:size={18} title="Voice Call" />
           </button>
           <button className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-600 hover:text-purple-600">
             <FiVideo size={18} title="Video Call" />

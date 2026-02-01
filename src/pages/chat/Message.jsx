@@ -28,41 +28,41 @@ export default function Message({ message, isConsecutive, onDelete }) {
 
   return (
     <div 
-      className={`flex ${isUserMessage ? 'justify-end' : 'justify-start'} gap-2 group`}
+      className={`flex ${isUserMessage ? 'justify-end' : 'justify-start'} gap-1 md:gap-2 group px-2 md:px-0 py-1`}
       onMouseEnter={() => setShowActions(true)}
       onMouseLeave={() => setShowActions(false)}
     >
       {!isUserMessage && !isConsecutive && (
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-xs text-white flex-shrink-0 font-semibold">
+        <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-xs text-white flex-shrink-0 font-semibold">
           {senderName.charAt(0).toUpperCase()}
         </div>
       )}
       {!isUserMessage && isConsecutive && (
-        <div className="w-8" />
+        <div className="w-6 md:w-8" />
       )}
 
       <div className={`flex flex-col ${isUserMessage ? 'items-end' : 'items-start'}`}>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 md:gap-2">
           <div
-            className={`max-w-xs lg:max-w-md px-4 py-2 rounded-2xl ${
+            className={`max-w-xs md:max-w-md px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-2xl text-sm md:text-base ${
               isUserMessage
                 ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-br-none shadow-md'
                 : 'bg-gray-200 text-gray-900 rounded-bl-none shadow-sm'
             } break-words transition-all duration-200 hover:shadow-lg`}
           >
-            <p className="text-sm">{message.text}</p>
+            <p className="text-sm leading-tight">{message.text}</p>
           </div>
 
           {/* Message Actions */}
           {showActions && (
-            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex gap-0.5 md:gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
               {isUserMessage && (
                 <button
                   onClick={() => onDelete(message._id)}
                   className="p-1 hover:bg-red-100 rounded transition-colors text-red-600"
                   title="Delete"
                 >
-                  <FiTrash2 size={16} />
+                  <FiTrash2 size={14} />
                 </button>
               )}
               {isUserMessage && (
@@ -78,18 +78,18 @@ export default function Message({ message, isConsecutive, onDelete }) {
         </div>
 
         {/* Timestamp */}
-        <span className={`text-xs mt-1 ${isUserMessage ? 'text-right' : 'text-left'} text-gray-500`}>
+        <span className={`text-xs mt-0.5 ${isUserMessage ? 'text-right' : 'text-left'} text-gray-500`}>
           {timestamp}
         </span>
       </div>
 
       {isUserMessage && !isConsecutive && (
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-xs text-white flex-shrink-0 font-semibold">
+        <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-xs text-white flex-shrink-0 font-semibold">
           {user?.fullName?.charAt(0).toUpperCase() || 'U'}
         </div>
       )}
       {isUserMessage && isConsecutive && (
-        <div className="w-8" />
+        <div className="w-6 md:w-8" />
       )}
     </div>
   );
