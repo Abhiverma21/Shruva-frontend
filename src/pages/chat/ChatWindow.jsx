@@ -5,7 +5,7 @@ import MessageInput from './MessageInput';
 import TypingIndicator from './TypingIndicator';
 import { getMessages, sendMessage } from '../../api/messageApi';
 import { AuthContext } from '../../context/AuthContext';
-import { getSocket, onNewMessage, offNewMessage } from '../../services/socketService';
+import { getSocket, onNewMessage, offNewMessage, joinChat, leaveChat } from '../../services/socketService';
 
 export default function ChatWindow({ chat, onBackClick }) {
   const [messages, setMessages] = useState([]);
@@ -32,7 +32,16 @@ export default function ChatWindow({ chat, onBackClick }) {
 
     if (chat && (chat.chatId || chat._id)) {
       loadMessages();
+      // Join chat room for real-time updates
+      joinChat(chat.chatId || chat._id);
     }
+
+    return () => {
+      // Leave chat room when component unmounts or chat changes
+      if (chat && (chat.chatId || chat._id)) {
+        leaveChat(chat.chatId || chat._id);
+      }
+    };
   }, [chat]);
 
   // Socket.io real-time message listener

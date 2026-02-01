@@ -2,6 +2,7 @@ import io from 'socket.io-client';
 
 let socket = null;
 let messageListeners = [];
+let currentChatId = null;
 
 export const initSocket = (userId) => {
   if (socket && socket.connected) {
@@ -19,11 +20,11 @@ export const initSocket = (userId) => {
     reconnectionDelay: 1000,
     reconnectionDelayMax: 5000,
     reconnectionAttempts: 5,
+    transports: ['websocket', 'polling'],
   });
 
   socket.on('connect', () => {
     console.log('Socket connected:', socket.id);
-    // Join room with userId
     socket.emit('addUser', userId);
   });
 
@@ -35,10 +36,14 @@ export const initSocket = (userId) => {
     console.error('Socket connection error:', error);
   });
 
-  // Re-attach all listeners when reconnecting
   socket.on('reconnect', () => {
     console.log('Socket reconnected');
     socket.emit('addUser', userId);
+    // Re-join current chat if exists
+    if (currentChatId) {
+      socket.emit('joinChat', currentChatId);
+    }
+    // Re-attach all listeners
     messageListeners.forEach(listener => {
       socket.on('newMessage', listener);
     });
@@ -49,11 +54,31 @@ export const initSocket = (userId) => {
 
 export const getSocket = () => socket;
 
+export const joinChat = (chatId) => {
+  if (!socket) {
+    console.warn('Socket not initialized');
+    return;
+  }
+  currentChatId = chatId;
+  socket.emit('joinChat', chatId);
+  console.log('Joined chat room:', chatId);
+};
+
+export const leaveChat = (chatId) => {
+  if (!socket) return;
+  socket.emit('leaveChat', chatId);
+  if (currentChatId === chatId) {
+    currentChatId = null;
+  }
+  console.log('Left chat room:', chatId);
+};
+
 export const disconnectSocket = () => {
   if (socket) {
     socket.disconnect();
     socket = null;
     messageListeners = [];
+    currentChatId = null;
   }
 };
 
@@ -63,9 +88,9 @@ export const onNewMessage = (callback) => {
     return;
   }
   
-  // Store listener for reconnection
   messageListeners.push(callback);
   socket.on('newMessage', callback);
+  console.log('Message listener attached');
 };
 
 export const onFriendAdded = (callback) => {
