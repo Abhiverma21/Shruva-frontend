@@ -2,8 +2,6 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FaFacebook, FaGoogle } from 'react-icons/fa'
 import { useAuth } from '../../context/AuthContext'
-import signupImage from '../../assets/signup.jpg';
-import logoImage from '../../assets/logo.png';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -66,7 +64,7 @@ const Login = () => {
       {/* Left Side - Image */}
       <div className="hidden lg:flex w-1/2 bg-white items-center justify-center relative overflow-hidden">
         <img 
-          src={signupImage}
+          src="/src/assets/signup.jpg"
           alt="Login"
           className="w-full h-full object-cover"
         />
@@ -78,7 +76,7 @@ const Login = () => {
           
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 mb-8">
-            <span className="text-3xl"><img src={logoImage} className='size-12' /></span>
+            <span className="text-3xl"><img src='/src/assets/logo.png' className='size-12' /></span>
             <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">
               Shruva
             </span>

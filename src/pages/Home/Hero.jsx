@@ -1,7 +1,5 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import hero1 from '../../assets/hero1.jpg';
-import hero2 from '../../assets/hero2.jpg';
 
 const Hero = () => {
   return (
@@ -58,7 +56,7 @@ const Hero = () => {
             {/* Image 1 - Top Right */}
             <div className="absolute top-0 right-0 w-3/5 z-20">
               <img 
-                src={hero2}
+                src="/src/assets/hero2.jpg"
                 alt="Chat interface"
                 className="w-full h-72 object-cover rounded-2xl shadow-xl hover:shadow-2xl transition-shadow duration-300"
               />
@@ -67,7 +65,7 @@ const Hero = () => {
             {/* Image 2 - Bottom Left */}
             <div className="absolute bottom-0 left-0 w-3/4 z-10">
               <img 
-                src={hero1}
+                src="/src/assets/hero1.jpg"
                 alt="Chat features"
                 className="w-full h-72 object-cover rounded-2xl shadow-xl hover:shadow-2xl transition-shadow duration-300"
               />
