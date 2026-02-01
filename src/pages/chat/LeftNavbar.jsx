@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react';
 import { FiMessageSquare, FiUser, FiHeart, FiPhone, FiPlus, FiSettings, FiLogOut, FiX, FiToggleLeft, FiToggleRight, FiBell, FiVolume2, FiMoon, FiLock } from 'react-icons/fi';
 import { AuthContext } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import logoImage from '../../assets/logo.png';
 
 export default function LeftNavbar({ activeSection, setActiveSection, selectedChat }) {
   const { logout } = useContext(AuthContext);
@@ -69,7 +70,7 @@ export default function LeftNavbar({ activeSection, setActiveSection, selectedCh
         {/* Logo - Hidden on mobile */}
         <div className="hidden md:flex items-center justify-center w-12 h-12 rounded-full bg-white bg-opacity-20 mb-4 hover:bg-opacity-30 transition-all cursor-pointer relative group">
           <a href="/"><span className="text-2xl">
-            <img src="/src/assets/logo.png" alt="" />
+            <img src={logoImage} alt="" />
           </span></a>
           
           <div className="absolute left-full ml-4 px-3 py-1 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-50">
