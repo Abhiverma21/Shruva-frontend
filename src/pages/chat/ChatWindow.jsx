@@ -38,11 +38,23 @@ export default function ChatWindow({ chat, onBackClick }) {
   // Socket.io real-time message listener
   useEffect(() => {
     const socket = getSocket();
-    if (!socket) return;
+    if (!socket) {
+      console.warn('Socket not available');
+      return;
+    }
 
-    const handleNewMessage = ({ chatId, message }) => {
+    const handleNewMessage = (data) => {
+      console.log('New message received:', data);
+      const { chatId, message } = data;
       if (chatId === (chat.chatId || chat._id)) {
-        setMessages(prev => [...prev, message]);
+        setMessages(prev => {
+          // Check if message already exists to prevent duplicates
+          const isDuplicate = prev.some(m => m._id === message._id);
+          if (isDuplicate) {
+            return prev;
+          }
+          return [...prev, message];
+        });
       }
     };
 
@@ -51,7 +63,7 @@ export default function ChatWindow({ chat, onBackClick }) {
     return () => {
       offNewMessage();
     };
-  }, [chat]);
+  }, [chat, chat._id, chat.chatId]);
 
   useEffect(() => {
     scrollToBottom();
@@ -65,17 +77,20 @@ export default function ChatWindow({ chat, onBackClick }) {
     if (!text.trim()) return;
 
     try {
-      setIsTyping(true);
       const { message } = await sendMessage({
         chatId: chat.chatId || chat._id,
         text,
       });
-      setMessages(prev => [...prev, message]);
+      // Add message immediately to UI
+      setMessages(prev => {
+        const isDuplicate = prev.some(m => m._id === message._id);
+        if (isDuplicate) return prev;
+        return [...prev, message];
+      });
     } catch (err) {
       console.error("Failed to send message", err);
-      alert('Failed to send message');
-    } finally {
-      setIsTyping(false);
+      const errorMsg = err.response?.data?.message || err.message || 'Failed to send message';
+      alert(`Error: ${errorMsg}`);
     }
   };
 
