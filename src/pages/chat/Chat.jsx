@@ -8,7 +8,7 @@ import CallsSection from './sections/CallsSection';
 import ProfileSection from './sections/ProfileSection';
 import FriendsSection from './sections/FriendsSection';
 import { AuthContext } from '../../context/AuthContext';
-import { initSocket } from '../../services/socketService';
+import { initSocket, onFriendAdded, offFriendAdded } from '../../services/socketService';
 import { getChats } from '../../api/chatApi';
 
 export default function Chat() {
@@ -20,10 +20,10 @@ export default function Chat() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user } = useContext(AuthContext);
 
-  // Determine which section is active based on URL
-  const pathParts = location.pathname.split('/').filter(Boolean);
-  const activeSection = pathParts[1] || 'chats';
-  const chatId = pathParts[2]; // This will be the chatId if URL is /chat/message/chatId
+  // Properly parse URL: /chat, /chat/chats, /chat/message/:chatId, /chat/friends, etc.
+  const pathMatch = location.pathname.match(/^\/chat(?:\/([^/]+))?(?:\/([^/]+))?/);
+  const activeSection = pathMatch?.[1] || 'chats'; // First param after /chat
+  const chatId = pathMatch?.[2]; // Second param (for /chat/message/:chatId)
 
   // Initialize Socket.io on mount and when user changes
   useEffect(() => {
@@ -35,45 +35,71 @@ export default function Chat() {
     }
   }, [user]);
 
-  // If a chatId is in URL, find and select that chat
+  // Fetch all chats on mount and when needed
   useEffect(() => {
-    if (chatId && chats.length > 0) {
-      const chat = chats.find(c => c._id === chatId || c.chatId === chatId);
-      if (chat) {
-        setSelectedChat(chat);
+    const fetchAllChats = async () => {
+      try {
+        const { chats: fetchedChats } = await getChats();
+        const formattedChats = (fetchedChats || []).map(c => ({
+          _id: c._id,
+          chatId: c._id,
+          id: c._id,
+          name: c.friend?.fullName || 'Unknown',
+          username: c.friend?.username || '',
+          friend: c.friend,
+          lastMessage: c.lastMessage?.text || '',
+          timestamp: c.lastMessage?.createdAt ? new Date(c.lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
+          unread: 0,
+          isOnline: false,
+        }));
+        setChats(formattedChats);
+      } catch (err) {
+        console.error("Failed to fetch chats", err);
       }
-    }
-  }, [chatId, chats]);
+    };
 
-  // Fetch a specific chat when directly accessing via URL and chat not in state
+    fetchAllChats();
+  }, []);
+
+  // Listen for new friend added and refresh chats
   useEffect(() => {
-    if (chatId && !selectedChat && activeSection === 'message') {
-      const fetchChatById = async () => {
+    const handleFriendAdded = ({ from, chatId: newChatId }) => {
+      console.log('Friend added event received, refetching chats');
+      // Refetch chats when friend is added
+      const fetchChats = async () => {
         try {
           const { chats: fetchedChats } = await getChats();
-          const foundChat = fetchedChats?.find(c => c._id === chatId);
-          if (foundChat) {
-            const formattedChat = {
-              _id: foundChat._id,
-              chatId: foundChat._id,
-              id: foundChat._id,
-              name: foundChat.friend?.fullName || 'Unknown',
-              username: foundChat.friend?.username || '',
-              friend: foundChat.friend,
-              lastMessage: foundChat.lastMessage?.text || '',
-              timestamp: foundChat.lastMessage?.createdAt ? new Date(foundChat.lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
-              unread: 0,
-              isOnline: false,
-            };
-            setSelectedChat(formattedChat);
+          const formattedChats = (fetchedChats || []).map(c => ({
+            _id: c._id,
+            chatId: c._id,
+            id: c._id,
+            name: c.friend?.fullName || 'Unknown',
+            username: c.friend?.username || '',
+            friend: c.friend,
+            lastMessage: c.lastMessage?.text || '',
+            timestamp: c.lastMessage?.createdAt ? new Date(c.lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
+            unread: 0,
+            isOnline: false,
+          }));
+          setChats(formattedChats);
+          // Auto select new chat if just added
+          const newChat = formattedChats.find(c => c._id === newChatId);
+          if (newChat) {
+            setSelectedChat(newChat);
           }
         } catch (err) {
-          console.error("Failed to fetch chat", err);
+          console.error("Failed to refetch chats after friend added", err);
         }
       };
-      fetchChatById();
-    }
-  }, [chatId, activeSection, selectedChat]);
+      fetchChats();
+    };
+
+    onFriendAdded(handleFriendAdded);
+
+    return () => {
+      offFriendAdded();
+    };
+  }, []);
 
   const handleNavigateSection = (section) => {
     navigate(`/chat/${section}`);
@@ -84,6 +110,16 @@ export default function Chat() {
     setSelectedChat(chat);
     navigate(`/chat/message/${chat._id}`);
   };
+
+  // When chatId changes in URL, select that chat from state
+  useEffect(() => {
+    if (chatId && chats.length > 0) {
+      const chat = chats.find(c => c._id === chatId || c.chatId === chatId);
+      if (chat) {
+        setSelectedChat(chat);
+      }
+    }
+  }, [chatId, chats]);
 
   return (
     <div className="flex flex-col md:flex-row h-screen bg-gray-50 overflow-hidden">

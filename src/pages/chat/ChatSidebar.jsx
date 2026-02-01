@@ -12,38 +12,10 @@ export default function ChatSidebar({ selectedChat, setSelectedChat, chatFilter,
   const [loading, setLoading] = useState(false);
   const [newChatOpen, setNewChatOpen] = useState(false);
 
-  // Update parent component when chats change
+  // Sync with parent chats prop
   useEffect(() => {
-    if (setPropChats) {
-      setPropChats(chats);
-    }
-  }, [chats, setPropChats]);
-
-  // Fetch existing chats on mount
-  useEffect(() => {
-    const fetchChats = async () => {
-      try {
-        const { chats: fetchedChats } = await getChats();
-        const formattedChats = (fetchedChats || []).map(c => ({
-          _id: c._id,
-          chatId: c._id,
-          id: c._id,
-          name: c.friend?.fullName || 'Unknown',
-          username: c.friend?.username || '',
-          friend: c.friend,
-          lastMessage: c.lastMessage?.text || '',
-          timestamp: c.lastMessage?.createdAt ? new Date(c.lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
-          unread: 0,
-          isOnline: false,
-        }));
-        setChats(formattedChats);
-      } catch (err) {
-        console.error("Failed to fetch chats", err);
-      }
-    };
-
-    fetchChats();
-  }, []);
+    setChats(propChats || []);
+  }, [propChats]);
 
   // Search for users when searchTerm changes
   useEffect(() => {
@@ -110,7 +82,7 @@ export default function ChatSidebar({ selectedChat, setSelectedChat, chatFilter,
       const { chatId, message } = await addFriend(userId);
       alert(message);
       
-      // Refetch chats
+      // Refetch chats to get latest
       const { chats: fetchedChats } = await getChats();
       const formattedChats = (fetchedChats || []).map(c => ({
         _id: c._id,
@@ -125,6 +97,12 @@ export default function ChatSidebar({ selectedChat, setSelectedChat, chatFilter,
         isOnline: false,
       }));
       setChats(formattedChats);
+      
+      // Update parent state too
+      if (setPropChats) {
+        setPropChats(formattedChats);
+      }
+      
       setSearchTerm('');
       setSearchResults([]);
 
